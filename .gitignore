@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-advent-of-code
+adventOfCode
 # Test binary, built with `go test -c`
 *.test
 
