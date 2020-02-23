@@ -48,7 +48,6 @@ func (c IntcodeComputer) runProgram() int {
 		c.memory[thirdParameter] = c.memory[firstParameter] * c.memory[secondParameter]
 		return 1
 	case OPCODE_HALT:
-		fmt.Println("halt found at", c.instructionPointer)
 		return -1
 	default:
 		return -1
@@ -77,36 +76,35 @@ func day2(part int) {
 	memory := loadProgramFromInput("input2.txt")
 
 	if part == 1 {
-		memory[1] = 12
-		memory[2] = 2
-		c := NewIntcodeComputer(memory)
-		c.runAllPrograms()
-		fmt.Println("Result for Part1:",memory[0])
+		day2part1(memory)
 	}
-	/*
-	noun := 0
-	verb := 0
-	for true {
-		iterationMemory := make([]int, len(memory))
-		copy(iterationMemory, memory)
-		fmt.Println(noun, verb)
-		iterationMemory[1] = noun
-		iterationMemory[2] = verb
-		runAllProgramms(iterationMemory)
-		if iterationMemory[0] == 19690720 {
-			fmt.Println(noun, verb)
-			return
-		}
-		if noun < 99 {
-			noun += 1
-		} else {
-			if verb < 99 {
-				verb += 1
+	if part == 2 {
+		day2part2(memory)
+	}
+}
+
+func day2part1(memory []int) {
+	memory[1] = 12
+	memory[2] = 2
+	c := NewIntcodeComputer(memory)
+	c.runAllPrograms()
+	fmt.Println("Result for Part1:",memory[0])
+}
+
+func day2part2(memory []int) {
+	for noun := 0; noun < 99; noun++ {
+		for verb := 0; verb < 99; verb++ {
+			iterationMemory := make([]int, len(memory))
+			copy(iterationMemory, memory)
+			iterationMemory[1] = noun
+			iterationMemory[2] = verb
+
+			c := NewIntcodeComputer(iterationMemory)
+			c.runAllPrograms()
+			if c.memory[0] == 19690720 {
+				fmt.Println("Result for Part2:", 100 * noun + verb)
+				return
 			}
 		}
-		if noun == 99 && verb == 99 {
-			return
-		}
 	}
-	 */
 }
