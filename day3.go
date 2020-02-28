@@ -2,33 +2,108 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
 
-const(
-	DIRECTION_UP = "U"
-	DIRECTION_DOWN = "D"
-	DIRECTION_LEFT = "L"
+const (
+	DIRECTION_UP    = "U"
+	DIRECTION_DOWN  = "D"
+	DIRECTION_LEFT  = "L"
 	DIRECTION_RIGHT = "R"
 )
 
-type Wires = []Wire
+type Wires = []*Wire
+type Route = []Path
 
-type Wire struct {
-	steps []Step
+type Position struct {
+	x int
+	y int
 }
 
-type Step struct {
+type Trail = []Position
+
+type Wire struct {
+	route Route
+	trail Trail
+}
+
+type Path struct {
 	direction string
-	length int
+	length    int
+}
+
+func (w *Wire) followRoute() {
+	for _, p := range w.route {
+		stepsGone := 0
+		for stepsGone < p.length {
+			switch p.direction {
+			case DIRECTION_LEFT:
+				w.trail = append(w.trail, Position{
+					x: w.trail[len(w.trail)-1].x - 1,
+					y: w.trail[len(w.trail)-1].y,
+				})
+			case DIRECTION_RIGHT:
+				w.trail = append(w.trail, Position{
+					x: w.trail[len(w.trail)-1].x + 1,
+					y: w.trail[len(w.trail)-1].y,
+				})
+			case DIRECTION_UP:
+				w.trail = append(w.trail, Position{
+					x: w.trail[len(w.trail)-1].x,
+					y: w.trail[len(w.trail)-1].y + 1,
+				})
+			case DIRECTION_DOWN:
+				w.trail = append(w.trail, Position{
+					x: w.trail[len(w.trail)-1].x,
+					y: w.trail[len(w.trail)-1].y - 1,
+				})
+			}
+			stepsGone += 1
+		}
+	}
+}
+
+func (w *Wire) crossingAt(other *Wire) {
+	min := 100000
+	for _, p := range w.trail {
+		for _, otherP := range other.trail {
+			if p == otherP {
+				distance := int(math.Abs(float64(p.x)) + math.Abs(float64(p.y)))
+				if distance > 0 && distance < min {
+					min = distance
+				}
+			}
+		}
+	}
+	fmt.Println("min", min)
+}
+
+func (w *Wire) closestStepCrossingAt(other *Wire) {
+	min := 100000
+	for iw, p := range w.trail {
+		for io, otherP := range other.trail {
+			if p == otherP {
+				distance := iw + io
+				if distance > 0 && distance < min {
+					min = distance
+				}
+			}
+		}
+	}
+	// Solution: 209
+	fmt.Println("min", min)
 }
 
 func day3(part int) {
 	wires := readDay3Input("input3.txt")
-	if part == 1 {
-		buildMap(wires)
+	for _, w := range wires {
+		w.followRoute()
+		fmt.Println("Final Position", w.trail[len(w.trail)-1])
 	}
+	// Solution: 43258
+	wires[0].closestStepCrossingAt(wires[1])
 }
 
 func readDay3Input(fileName string) Wires {
@@ -40,77 +115,16 @@ func readDay3Input(fileName string) Wires {
 		splittedLine := strings.Split(l, ",")
 		wire := Wire{}
 
+		wire.trail = append(wire.trail, Position{0, 0})
+
 		for _, split := range splittedLine {
 			s, _ := strconv.Atoi(split[1:])
-			wire.steps = append(wire.steps, Step{
+			wire.route = append(wire.route, Path{
 				string(split[0]),
 				s,
 			})
 		}
-		wires = append(wires, wire)
+		wires = append(wires, &wire)
 	}
 	return wires
-}
-
-type Map = [][]int
-
-func buildMap(wires Wires) Map {
-	maxUp := 0
-	maxDown := 0
-	maxLeft := 0
-	maxRight := 0
-
-	for _, wire := range wires {
-		currVertical := 0
-		currHorizontal := 0
-
-		for _, step := range wire.steps {
-			switch step.direction {
-			case DIRECTION_UP:
-				currVertical += step.length
-				if currVertical > maxUp {
-					maxUp = currVertical
-				}
-			case DIRECTION_DOWN:
-				currVertical -= step.length
-				if -currVertical > maxDown {
-					maxDown = -currVertical
-				}
-			case DIRECTION_LEFT:
-				currHorizontal -= step.length
-				if -currHorizontal > maxLeft {
-					maxLeft = -currHorizontal
-				}
-			case DIRECTION_RIGHT:
-				currHorizontal += step.length
-				if currHorizontal > maxRight {
-					maxRight = currHorizontal
-				}
-			}
-		}
-	}
-
-	fmt.Println("MaxUp:", maxUp)
-	fmt.Println("maxDown:", maxDown)
-	fmt.Println("maxLeft:", maxLeft)
-	fmt.Println("maxRight:", maxRight)
-
-	mapHorizontal := make([][]int, maxLeft+maxRight)
-	for i := range mapHorizontal {
-		mapHorizontal[i] = make([]int, maxUp+maxDown)
-	}
-	return mapHorizontal
-}
-
-func drawWiresOnMap() {
-	// for the first wire
-	// -- walk path and mark with X
-	// for the second wire
-	// -- walk path, mark with Y if empty, mark with Z if cross
-}
-
-func findClosestCrossing() {
-	// for each crossing
-	// -- calculate horizontal and vertical difference to middle, add up
-	// choose crossing with minimum
 }
