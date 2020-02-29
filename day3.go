@@ -29,6 +29,13 @@ type Wire struct {
 	trail Trail
 }
 
+func newWire() *Wire {
+	w := Wire{
+		trail: Trail{Position{0, 0}},
+	}
+	return &w
+}
+
 type Path struct {
 	direction string
 	length    int
@@ -65,34 +72,42 @@ func (w *Wire) followRoute() {
 	}
 }
 
-func (w *Wire) crossingAt(other *Wire) {
+func (w *Wire) crossingAt(other *Wire) int {
 	min := 100000
 	for _, p := range w.trail {
-		for _, otherP := range other.trail {
-			if p == otherP {
-				distance := int(math.Abs(float64(p.x)) + math.Abs(float64(p.y)))
-				if distance > 0 && distance < min {
-					min = distance
-				}
-			}
-		}
-	}
-	fmt.Println("min", min)
-}
-
-func (w *Wire) closestStepCrossingAt(other *Wire) {
-	min := 100000
-	for iw, p := range w.trail {
-		for io, otherP := range other.trail {
-			if p == otherP {
-				distance := iw + io
-				if distance > 0 && distance < min {
-					min = distance
+		d := manhattanDistance(p.x, p.y)
+		if d > 0 && d < min {
+			for _, otherP := range other.trail {
+				if p == otherP {
+					min = d
 				}
 			}
 		}
 	}
 	// Solution: 209
+	return min
+}
+
+// manhattanDistance computes the manhattan distance to the center (0,0)
+func manhattanDistance(x, y int) int {
+	return int(math.Abs(float64(x)) + math.Abs(float64(y)))
+}
+
+func (w *Wire) closestStepCrossingAt(other *Wire) {
+	min := 100000
+	for iw, p := range w.trail {
+		if iw < min {
+			for io, otherP := range other.trail {
+				if p == otherP {
+					distance := iw + io
+					if distance > 0 && distance < min {
+						min = distance
+					}
+				}
+			}
+		}
+	}
+	// Solution: 43258
 	fmt.Println("min", min)
 }
 
@@ -100,10 +115,12 @@ func day3(part int) {
 	wires := readDay3Input("input3.txt")
 	for _, w := range wires {
 		w.followRoute()
-		fmt.Println("Final Position", w.trail[len(w.trail)-1])
 	}
-	// Solution: 43258
-	wires[0].closestStepCrossingAt(wires[1])
+	if part == 1 {
+		fmt.Println("min", wires[0].crossingAt(wires[1]))
+	} else {
+		wires[0].closestStepCrossingAt(wires[1])
+	}
 }
 
 func readDay3Input(fileName string) Wires {
@@ -113,9 +130,7 @@ func readDay3Input(fileName string) Wires {
 
 	for _, l := range lines {
 		splittedLine := strings.Split(l, ",")
-		wire := Wire{}
-
-		wire.trail = append(wire.trail, Position{0, 0})
+		wire := newWire()
 
 		for _, split := range splittedLine {
 			s, _ := strconv.Atoi(split[1:])
@@ -124,7 +139,7 @@ func readDay3Input(fileName string) Wires {
 				s,
 			})
 		}
-		wires = append(wires, &wire)
+		wires = append(wires, wire)
 	}
 	return wires
 }

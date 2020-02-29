@@ -5,6 +5,8 @@
 *.so
 *.dylib
 adventOfCode
+advent-of-code
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -13,6 +15,7 @@ adventOfCode
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+go.sum
 
 # ide
 .idea
