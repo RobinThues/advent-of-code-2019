@@ -1,11 +1,13 @@
 package main
 
+import "fmt"
+
 func main() {
   // day2(2)
-  //day3(1)
+  fmt.Println(day1(1))
   //loads := day1(1)
   //fmt.Println(loads)
-  day4()
+  //day4()
 }
 
 

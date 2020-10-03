@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"strconv"
 )
@@ -32,13 +31,13 @@ func fuelForLoad(load, part int) int {
 func loadInput(fileName string) []string {
 	file, err := os.Open(fileName)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Fatal(err)
+			//log.Fatal(err)
 		}
 	}()
 
