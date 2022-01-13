@@ -1,14 +1,15 @@
 package main
 
-import "fmt"
+import (
+	twentyone "github.com/robinthues/advent-of-code/2021"
+	"github.com/robinthues/advent-of-code/helpers"
+)
 
 func main() {
-  // day2(2)
-  fmt.Println(day1(1))
-  //loads := day1(1)
-  //fmt.Println(loads)
-  //day4()
+	lines, err := helpers.LoadInput("2021/input-2021-5.txt")
+	if err != nil {
+		println(err)
+	}
+
+	twentyone.D5one(lines)
 }
-
-
-

@@ -1,6 +1,6 @@
 module github.com/robinthues/advent-of-code
 
-go 1.13
+go 1.17
 
 require (
 	github.com/robinthues/go-helpers v0.0.2
